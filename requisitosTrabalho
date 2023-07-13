@@ -1,0 +1,88 @@
+“Sistemas de Arquivos”
+
+1) Neste trabalho, você deverá implementar um simulador de um Sistema de Arquivos e um
+interpretador de comandos para utilizá-lo
+2) O trabalho poderá ser feito em grupo de até 4 pessoas
+3) O sistema de arquivos poderá ser implementado através da utilização de estruturas de dados
+típicas como listas encadeadas ou árvore
+a. Utilizar a linguagem de programação que preferir
+b. Deverá haver uma hierarquia de diretórios, e todos arquivos e subdiretórios deverão estar
+abaixo do diretório raiz (como na figura abaixo)
+c. Poderão ser criados novos diretórios e novos arquivos pelo usuário
+4) O sistema de arquivos deverá contar com a abstração de usuários com seus respectivos login e
+senha
+a. Inicialmente o sistema inicializará pedindo login e senha
+b. Você já deverá ter criado o superusuário e informar o login e senha ao professor
+c. O superusuário terá permissão total sobre o sistema, podendo inclusive criar ou deletar
+novos usuários. Inicialmente o sistema de arquivos só conterá o diretório raiz
+d. Os outros usuários do sistema terão operações restritas, como manipulação somente dos
+diretórios e arquivos que cada um deles criou. Eles também não poderão criar nem deletar
+outros usuários.
+e. Alguns comandos relativos aos usuários deverão ser aceitos (exemplos):
+i. CRIARUSR <login> <senha> - cria um novo usuário. Automaticamente criará
+ID para este usuário. Também automaticamente criará uma pasta para este usuário
+com o nome do login na raiz. Somente o root poderá criar usuários
+ii. ALTERARUSR <login_usuario> <senha> - fará o login do novo usuário
+iii. DELETARUSR <login> - Apagará o usuário. Automaticamente apagará o seu
+diretório. Permitido somente ao usuário root.
+iv. SAIR - deverá fazer logout do sistema. Aparecerá então novamente a tela para
+inserir o login e senha
+v. ...
+
+5) Em relação aos nomes dos arquivos e dos diretórios:
+a. Os nomes dos arquivos e pastas poderão ter no máximo 14 caracteres (excluindo a
+extensão)
+b. Os arquivos deverão obrigatoriamente possuir uma extensão, separando o nome do arquivo
+de sua extensão o caractere ponto (.)
+c. Os nomes não poderão começar ou conter com os caracteres especiais (!,?, @, #, $, %, &,
+*, +, - )
+d. Cada arquivo e diretório deverá conter uma lista de atributos: ID, data e hora de criação e
+proprietário
+
+6) Os subdiretórios dentro de um diretório deverão estar ordenados pelos seus nomes
+a. Se houver arquivos dentro deste diretório, os diretórios deverão aparecer primeiro
+(ordenadamente) e posteriormente os arquivos (também ordenadamente)
+b. Logo, os arquivos dentro de um diretório também deverão estar ordenados pelos seus
+nomes
+
+7) Você deverá construir um Interpretador de Comandos que aceite os seguintes comandos:
+a. CDIR <nome_do_diretório> – cria um novo diretório
+b. CARQ <nome_do_arquivo> – cria um novo arquivo
+c. LISTARATR <nome_do_arq_ou_dir> – lista os atributos de um determinado arquivo ou
+diretório
+d. RDIR <nome_do_dir> – apaga um diretório vazio
+e. APAGAR <nome> – apaga um arquivo ou um diretório com arquivos (e faz isso
+recursivamente)
+f. LISTAR – lista o conteúdo do diretório atual, que deve estar em ordem alfabética.
+g. LISTARINV – lista o conteúdo do diretório em ordem decrescente.
+h. LISTARTUDO – lista o conteúdo do diretório e se houver, também listará o conteúdo dos
+subdiretórios (mostrará a estrutura de arquivos completa)
+i. MUDAR <end_destino> – altera o estado atual de uma pasta para outra qualquer
+j. ATUAL – mostra o nome do diretório atual
+k. COPIAR <origem> <destino> – copia um arquivo/diretório para um outro lugar
+informado
+l. RENOMEAR <nome_atual> <nome_final> – renomeia um arquivo ou diretório
+m. MOVER <origem> <destino> – move um arquivo/diretório para um outro lugar
+informado
+n. BUSCAR <nome_arquivo> <dir_de_busca> – busca um arquivo informado na
+hierarquia de diretório
+OBS: Os parâmetros passados para estes comandos deverão ser similares aos parâmetros dos
+comandos encontrados no LINUX
+Exemplo:
+COPIAR /home/rodrigofs/musica.mp3 /musicas/
+MUDAR /home/vídeos
+MUDAR ..
+RDIR /home/vídeos
+BUSCAR musica.mp3 /home/
+
+ATENÇÂO: os erros deverão ser tratados. Exemplos:
+a. Se der o comando COPIAR /home/musica.mp3 /etc/ E se por acaso não
+existir o diretório home, ou o arquivo musica.mp3 ou ... deverá ser informado que tal
+arquivo ou diretório não existe
+b. Se for feito o login com um usuário inexistente ou senha inválida, deverá também aparecer
+uma mensagem de erro informando
+c. ...
+8) Quando o programa for finalizado, deverá salvar em arquivo as alterações feitas, ou seja, todos os
+diretórios e arquivos criados (suas estruturas) no disco.
+a. Quando o programa for iniciado, ele irá ler esse arquivo salvo e reconstruirá toda a
+estrutura de arquivos já criada
