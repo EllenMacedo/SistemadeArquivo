@@ -18,7 +18,7 @@ typedef struct {
 
 void cadastrarUsuario(Usuario* usuarios, int* numUsuarios, char* login, char* senha) {
     if (*numUsuarios >= MAX_USUARIOS) {
-        printf("Número maximo de usuarios atingido.\n");
+        printf("N�mero maximo de usuarios atingido.\n");
         return;
     }
 
@@ -49,7 +49,7 @@ void cadastrarUsuario(Usuario* usuarios, int* numUsuarios, char* login, char* se
 int fazerLogin(Usuario* usuarios, int numUsuarios, char* nome, char* senha) {
     for (int i = 0; i < numUsuarios; i++) {
         if (strcmp(usuarios[i].nome, nome) == 0 && strcmp(usuarios[i].senha, senha) == 0) {
-            return i; // Retorna o índice do usuario encontrado
+            return i; // Retorna o �ndice do usuario encontrado
         }
     }
     return -1; // Retorna -1 se o login falhar
@@ -301,7 +301,7 @@ void criarArquivo(char* nomeUsuario, char* nomeArquivo) {
     FILE* arquivo = fopen(caminhoArquivo, "w");
     if (arquivo) {
         printf("Arquivo criado com sucesso.\n");
-        printf("Digite o conteúdo do arquivo (Digite '.' em uma nova linha para sair):\n");
+        printf("Digite o conte�do do arquivo (Digite '.' em uma nova linha para sair):\n");
 
         char linha[100];
         while (1) {
