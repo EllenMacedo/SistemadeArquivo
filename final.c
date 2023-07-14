@@ -89,16 +89,23 @@ void deletarUsuario(Usuario* usuarios, int* numUsuarios, char* login) {
         struct dirent* entrada;
         while ((entrada = readdir(dir)) != NULL) {
             if (strcmp(entrada->d_name, ".") != 0 && strcmp(entrada->d_name, "..") != 0) {
-                char caminhoArquivo[TAM_CAMINHO];
-                sprintf(caminhoArquivo, "%s/%s", nomeDiretorio, entrada->d_name);
-                remove(caminhoArquivo);
+                char caminhoItem[TAM_CAMINHO];
+                sprintf(caminhoItem, "%s/%s", nomeDiretorio, entrada->d_name);
+
+                if (entrada->d_type == DT_DIR) {
+                    // Remover diretório
+                    apagarDiretorioRecursivo(caminhoItem);
+                } else {
+                    // Remover arquivo
+                    remove(caminhoItem);
+                }
             }
         }
         closedir(dir);
         rmdir(nomeDiretorio);
+        printf("Usuário removido com sucesso.\n");
     } else {
         printf("Erro ao abrir diretório do usuário.\n");
-        return;
     }
 
     // Remover usuário da lista
@@ -106,8 +113,29 @@ void deletarUsuario(Usuario* usuarios, int* numUsuarios, char* login) {
         usuarios[i] = usuarios[i + 1];
     }
     (*numUsuarios)--;
+}
 
-    printf("Usuário removido com sucesso.\n");
+void apagarDiretorioRecursivo(const char* nomeDiretorio) {
+    DIR* dir = opendir(nomeDiretorio);
+    if (dir) {
+        struct dirent* entrada;
+        while ((entrada = readdir(dir)) != NULL) {
+            if (strcmp(entrada->d_name, ".") != 0 && strcmp(entrada->d_name, "..") != 0) {
+                char caminhoItem[TAM_CAMINHO];
+                sprintf(caminhoItem, "%s/%s", nomeDiretorio, entrada->d_name);
+
+                if (entrada->d_type == DT_DIR) {
+                    // Remover diretório recursivamente
+                    apagarDiretorioRecursivo(caminhoItem);
+                } else {
+                    // Remover arquivo
+                    remove(caminhoItem);
+                }
+            }
+        }
+        closedir(dir);
+        rmdir(nomeDiretorio);
+    }
 }
 
 void modificarUsuario(Usuario* usuarios, int numUsuarios, int indice) {
@@ -120,7 +148,14 @@ void modificarUsuario(Usuario* usuarios, int numUsuarios, int indice) {
         printf("2. Modificar senha\n");
         printf("3. Criar diretório do usuário\n");
         printf("4. Criar arquivo\n");
-        printf("5. Voltar\n");
+        printf("5. Mostrar diretório atual\n");
+        printf("6. Apagar arquivo\n");
+        printf("7. Apagar diretório\n");
+        printf("8. Renomear arquivo\n");
+        printf("9. Renomear diretório\n");
+        printf("10. Mover arquivo ou diretório\n");
+        printf("11. Criar diretório dentro do diretório atual\n");
+        printf("12. Voltar\n");
         printf("Escolha uma opção: ");
         scanf("%d", &opcao);
 
@@ -152,9 +187,61 @@ void modificarUsuario(Usuario* usuarios, int numUsuarios, int indice) {
                 criarArquivo(usuarios[indice].nome, nomeArquivo);
                 break;
             }
-            case 5:
-                printf("Voltando...\n");
+            case 5: {
+                mostrarDiretorioAtual(usuarios[indice].nome);
+                break;
+            }
+            case 6: {
+                char nomeArquivo[TAM_CAMINHO];
+                printf("Digite o nome do arquivo para apagar: ");
+                scanf("%s", nomeArquivo);
+                apagarArquivo(usuarios[indice].nome, nomeArquivo);
+                break;
+            }
+            case 7: {
+                apagarDiretorioUsuario(usuarios[indice].nome);
+                break;
+            }
+            case 8: {
+                char nomeArquivoAntigo[TAM_CAMINHO];
+                char nomeArquivoNovo[TAM_CAMINHO];
+                printf("Digite o nome do arquivo a ser renomeado: ");
+                scanf("%s", nomeArquivoAntigo);
+                printf("Digite o novo nome do arquivo: ");
+                scanf("%s", nomeArquivoNovo);
+                renomearArquivo(usuarios[indice].nome, nomeArquivoAntigo, nomeArquivoNovo);
+                break;
+            }
+            case 9: {
+                char nomeDiretorioAntigo[TAM_CAMINHO];
+                char nomeDiretorioNovo[TAM_CAMINHO];
+                printf("Digite o nome do diretório a ser renomeado: ");
+                scanf("%s", nomeDiretorioAntigo);
+                printf("Digite o novo nome do diretório: ");
+                scanf("%s", nomeDiretorioNovo);
+                renomearDiretorio(usuarios[indice].nome, nomeDiretorioAntigo, nomeDiretorioNovo);
+                break;
+            }
+            case 10: {
+                char nomeItem[TAM_CAMINHO];
+                char novoDiretorio[TAM_CAMINHO];
+                printf("Digite o nome do item (arquivo ou diretório) a ser movido: ");
+                scanf("%s", nomeItem);
+                printf("Digite o novo diretório de destino: ");
+                scanf("%s", novoDiretorio);
+                moverItem(usuarios[indice].nome, nomeItem, novoDiretorio);
+                break;
+            }
+            case 11: {
+                char nomeDiretorio[TAM_CAMINHO];
+                printf("Digite o nome do diretório a ser criado: ");
+                scanf("%s", nomeDiretorio);
+                criarDiretorio(usuarios[indice].nome, nomeDiretorio);
+                break;
+            }
+            case 12: {
                 return;
+            }
             default:
                 printf("Opção inválida.\n");
                 break;
@@ -170,6 +257,17 @@ void criarDiretorioUsuario(char* nomeUsuario) {
         printf("Diretório do usuário criado com sucesso.\n");
     } else {
         printf("Erro ao criar diretório do usuário.\n");
+    }
+}
+
+void criarDiretorio(char* nomeUsuario, char* nomeDiretorio) {
+    char caminhoDiretorio[TAM_CAMINHO];
+    sprintf(caminhoDiretorio, "usuarios/%s/%s", nomeUsuario, nomeDiretorio);
+
+    if (mkdir(caminhoDiretorio) == 0) {
+        printf("Diretório criado com sucesso.\n");
+    } else {
+        printf("Erro ao criar diretório.\n");
     }
 }
 
@@ -196,6 +294,100 @@ void criarArquivo(char* nomeUsuario, char* nomeArquivo) {
         printf("Erro ao criar arquivo.\n");
     }
 }
+
+void mostrarDiretorioAtual(char* nomeUsuario) {
+    char nomeDiretorio[TAM_CAMINHO];
+    sprintf(nomeDiretorio, "usuarios/%s", nomeUsuario);
+
+    printf("Diretório atual: %s\n", nomeDiretorio);
+}
+
+void apagarArquivo(char* nomeUsuario, char* nomeArquivo) {
+    char caminhoArquivo[TAM_CAMINHO];
+    sprintf(caminhoArquivo, "usuarios/%s/%s", nomeUsuario, nomeArquivo);
+
+    if (remove(caminhoArquivo) == 0) {
+        printf("Arquivo apagado com sucesso.\n");
+    } else {
+        printf("Erro ao apagar arquivo.\n");
+    }
+}
+
+void apagarDiretorioUsuario(char* nomeUsuario) {
+    char nomeDiretorio[TAM_CAMINHO];
+    sprintf(nomeDiretorio, "usuarios/%s", nomeUsuario);
+
+    apagarDiretorioRecursivo(nomeDiretorio);
+    printf("Diretório do usuário apagado com sucesso.\n");
+}
+
+void renomearArquivo(char* nomeUsuario, char* nomeArquivoAntigo, char* nomeArquivoNovo) {
+    char caminhoArquivoAntigo[TAM_CAMINHO];
+    char caminhoArquivoNovo[TAM_CAMINHO];
+    sprintf(caminhoArquivoAntigo, "usuarios/%s/%s", nomeUsuario, nomeArquivoAntigo);
+    sprintf(caminhoArquivoNovo, "usuarios/%s/%s", nomeUsuario, nomeArquivoNovo);
+
+    if (rename(caminhoArquivoAntigo, caminhoArquivoNovo) == 0) {
+        printf("Arquivo renomeado com sucesso.\n");
+    } else {
+        printf("Erro ao renomear arquivo.\n");
+    }
+}
+
+void renomearDiretorio(char* nomeUsuario, char* nomeDiretorioAntigo, char* nomeDiretorioNovo) {
+    char caminhoDiretorioAntigo[TAM_CAMINHO];
+    char caminhoDiretorioNovo[TAM_CAMINHO];
+    sprintf(caminhoDiretorioAntigo, "usuarios/%s/%s", nomeUsuario, nomeDiretorioAntigo);
+    sprintf(caminhoDiretorioNovo, "usuarios/%s/%s", nomeUsuario, nomeDiretorioNovo);
+
+    if (rename(caminhoDiretorioAntigo, caminhoDiretorioNovo) == 0) {
+        printf("Diretório renomeado com sucesso.\n");
+    } else {
+        printf("Erro ao renomear diretório.\n");
+    }
+}
+
+void moverItem(char* nomeUsuario, char* nomeItem, char* novoDiretorio) {
+    char caminhoItem[TAM_CAMINHO];
+    char caminhoDestino[TAM_CAMINHO];
+    sprintf(caminhoItem, "usuarios/%s/%s", nomeUsuario, nomeItem);
+    sprintf(caminhoDestino, "usuarios/%s/%s", nomeUsuario, novoDiretorio);
+
+    struct stat info;
+    if (stat(caminhoDestino, &info) == 0 && S_ISDIR(info.st_mode)) {
+        char caminhoDestinoCompleto[TAM_CAMINHO];
+        sprintf(caminhoDestinoCompleto, "%s/%s", caminhoDestino, nomeItem);
+
+        if (rename(caminhoItem, caminhoDestinoCompleto) == 0) {
+            printf("Item movido com sucesso.\n");
+        } else {
+            printf("Erro ao mover item.\n");
+        }
+    } else {
+        printf("Destino inválido. O diretório não existe.\n");
+    }
+}
+
+void buscarArquivo(char* nomeUsuario, char* nomeArquivo) {
+    char caminhoDiretorio[TAM_CAMINHO];
+    sprintf(caminhoDiretorio, "usuarios/%s", nomeUsuario);
+
+    DIR* dir = opendir(caminhoDiretorio);
+    if (dir) {
+        struct dirent* entrada;
+        while ((entrada = readdir(dir)) != NULL) {
+            if (entrada->d_type == DT_REG && strcmp(entrada->d_name, nomeArquivo) == 0) {
+                printf("Arquivo encontrado: %s\n", entrada->d_name);
+                closedir(dir);
+                return;
+            }
+        }
+        closedir(dir);
+    }
+
+    printf("Arquivo não encontrado.\n");
+}
+
 
 int main() {
     Usuario usuarios[MAX_USUARIOS];
@@ -237,7 +429,7 @@ int main() {
                 printf("Bem-vindo, superusuário!\n");
                 while (1) {
                     char comando[50];
-                    printf("Digite um comando (CRIARUSR, ALTERARUSR, DELETARUSR, MODIFICAR, NOVOLOGIN, SAIR): ");
+                    printf("Digite um comando (CRIARUSR, ALTERARUSR, DELETARUSR, BUSCAR, MODIFICAR, NOVOLOGIN, SAIR): ");
                     scanf("%s", comando);
 
                     if (strcmp(comando, "CRIARUSR") == 0) {
@@ -248,35 +440,61 @@ int main() {
 
                         char novoLogin[TAM_NOME_USUARIO];
                         char novaSenha[TAM_SENHA];
-                        printf("Digite o nome de usuário: ");
+
+                        printf("Digite o nome do novo usuário: ");
                         scanf("%s", novoLogin);
-                        printf("Digite a senha: ");
+
+                        printf("Digite a senha do novo usuário: ");
                         scanf("%s", novaSenha);
+
                         cadastrarUsuario(usuarios, &numUsuarios, novoLogin, novaSenha);
                     } else if (strcmp(comando, "ALTERARUSR") == 0) {
-                        char novoLogin[TAM_NOME_USUARIO];
+                        if (!usuarios[indice].superusuario) {
+                            printf("Apenas o superusuário pode alterar usuários.\n");
+                            continue;
+                        }
+
+                        char loginModificado[TAM_NOME_USUARIO];
                         char novaSenha[TAM_SENHA];
-                        printf("Digite o nome de usuário: ");
-                        scanf("%s", novoLogin);
+
+                        printf("Digite o nome do usuário a ser alterado: ");
+                        scanf("%s", loginModificado);
+
                         printf("Digite a nova senha: ");
                         scanf("%s", novaSenha);
-                        alterarUsuario(usuarios, numUsuarios, novoLogin, novaSenha);
+
+                        alterarUsuario(usuarios, numUsuarios, loginModificado, novaSenha);
                     } else if (strcmp(comando, "DELETARUSR") == 0) {
                         if (!usuarios[indice].superusuario) {
                             printf("Apenas o superusuário pode deletar usuários.\n");
                             continue;
                         }
 
-                        char loginDeletar[TAM_NOME_USUARIO];
-                        printf("Digite o nome de usuário a ser deletado: ");
-                        scanf("%s", loginDeletar);
-                        deletarUsuario(usuarios, &numUsuarios, loginDeletar);
+                        char loginDeletado[TAM_NOME_USUARIO];
+
+                        printf("Digite o nome do usuário a ser deletado: ");
+                        scanf("%s", loginDeletado);
+
+                        deletarUsuario(usuarios, &numUsuarios, loginDeletado);
                     } else if (strcmp(comando, "MODIFICAR") == 0) {
-                        modificarUsuario(usuarios, numUsuarios, indice);
-                    } else if (strcmp(comando, "NOVOLOGIN") == 0) {
+                        int indiceUsuario;
+                        printf("Digite o nome do usuário a ser modificado: ");
+                        scanf("%s", nome);
+                        indiceUsuario = fazerLogin(usuarios, numUsuarios, nome, senha);
+                        if (indiceUsuario == -1) {
+                            printf("Usuário não encontrado.\n");
+                            continue;
+                        }
+                        modificarUsuario(usuarios, numUsuarios, indiceUsuario);
+                    }  else if (strcmp(comando, "BUSCAR") == 0) {
+                          char nomeArquivo[TAM_CAMINHO];
+                              printf("Digite o nome do arquivo a ser buscado: ");
+                              scanf("%s", nomeArquivo);
+                               buscarArquivo(usuarios[indice].nome, nomeArquivo);
+               }else if (strcmp(comando, "NOVOLOGIN") == 0) {
                         break;
                     } else if (strcmp(comando, "SAIR") == 0) {
-                        printf("Logout realizado com sucesso.\n");
+                        printf("Encerrando o programa...\n");
                         return 0;
                     } else {
                         printf("Comando inválido.\n");
@@ -284,22 +502,7 @@ int main() {
                 }
             } else {
                 printf("Bem-vindo, %s!\n", usuarios[indice].nome);
-                while (1) {
-                    char comando[50];
-                    printf("Digite um comando (MODIFICAR, NOVOLOGIN, SAIR): ");
-                    scanf("%s", comando);
-
-                    if (strcmp(comando, "MODIFICAR") == 0) {
-                        modificarUsuario(usuarios, numUsuarios, indice);
-                    } else if (strcmp(comando, "NOVOLOGIN") == 0) {
-                        break;
-                    } else if (strcmp(comando, "SAIR") == 0) {
-                        printf("Logout realizado com sucesso.\n");
-                        return 0;
-                    } else {
-                        printf("Comando inválido.\n");
-                    }
-                }
+                modificarUsuario(usuarios, numUsuarios, indice);
             }
         }
     }
