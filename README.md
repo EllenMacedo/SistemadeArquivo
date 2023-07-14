@@ -13,7 +13,7 @@ EXEMPLO:
 2) fulano>123>N (N=desistiu de continuar o login, o programa encerra).
 
 
-CRIARUSR - cria um novo usuário.
+CRIARUSR - cria um novo usuário e cria a pasta raiz usuarios.
 ALTERARUSR - fará o login do novo usuário
 DELETARUSR  - Apagará o usuário.
 SAIR - deverá fazer logout do sistema. 
