@@ -7,7 +7,8 @@ Login: admin
 Senha: admin123
 
 EXEMPLO:
-admin>admin123>CRIARUSR>fulano>senha123>NOVOLOGIN>fulano>senha123>MODIFICAR>3>4>nomearquivo>conteudo>.>11>subpasta>10>nomearquivo>subpasta>12>SAIR.
+1) admin>admin123>CRIARUSR>fulano>senha123>NOVOLOGIN>fulano>senha123>MODIFICAR>3>4>nomearquivo>conteudo>.>11>subpasta>10>nomearquivo>subpasta>12>SAIR.
+2) fulano>123>N (N=desistiu de continuar o login, o programa encerra).
 
 
 CRIARUSR - cria um novo usuário.
