@@ -15,10 +15,25 @@ typedef struct {
     char senha[TAM_SENHA];
     int superusuario;
 } Usuario;
+void cadastrarUsuario(Usuario* usuarios, int* numUsuarios, char* login, char* senha);
+int fazerLogin(Usuario* usuarios, int numUsuarios, char* nome, char* senha);
+void alterarUsuario(Usuario* usuarios, int numUsuarios, char* login, char* senha);
+void deletarUsuario(Usuario* usuarios, int* numUsuarios, char* login);
+void renomearDiretorio(char* nomeUsuario, char* nomeDiretorioAntigo, char* nomeDiretorioNovo);
+void moverItem(char* nomeUsuario, char* nomeItem, char* novoDiretorio);
+void criarDiretorio(char* nomeUsuario, char* nomeDiretorio);
+void modificarUsuario(Usuario* usuarios, int numUsuarios, int indice);
+void criarDiretorioUsuario(char* nomeUsuario);
+void criarArquivo(char* nomeUsuario, char* nomeArquivo);
+void mostrarDiretorioAtual(char* nomeUsuario);
+void apagarArquivo(char* nomeUsuario, char* nomeArquivo);
+void apagarDiretorioUsuario(char* nomeUsuario);
+void renomearArquivo(char* nomeUsuario, char* nomeArquivoAntigo, char* nomeArquivoNovo);
+void buscarArquivo(char* nomeUsuario, char* nomeArquivo);
 
 void cadastrarUsuario(Usuario* usuarios, int* numUsuarios, char* login, char* senha) {
     if (*numUsuarios >= MAX_USUARIOS) {
-        printf("N�mero maximo de usuarios atingido.\n");
+        printf("Numero máximo de usuários atingido.\n");
         return;
     }
 
@@ -27,22 +42,22 @@ void cadastrarUsuario(Usuario* usuarios, int* numUsuarios, char* login, char* se
     strcpy(novoUsuario.senha, senha);
     novoUsuario.superusuario = 0;
 
-    // Criar diretorio "usuarios/" se ainda nao existir
+    // Criar diretório "usuarios/" se ainda não existir
     if (mkdir("usuarios") != 0 && errno != EEXIST) {
-        printf("Erro ao criar diretorio para os usuarios.\n");
+        printf("Erro ao criar diretório para os usuários.\n");
         return;
     }
 
-    // Criar diretorio para o novo usuario
+    // Criar diretório para o novo usuário
     char nomeDiretorio[TAM_NOME_USUARIO + 10]; // +10 para acomodar o prefixo do caminho
     sprintf(nomeDiretorio, "usuarios/%s", login);
 
     if (mkdir(nomeDiretorio) == 0) {
-        printf("Usuario criado com sucesso.\n");
+        printf("Usuário criado com sucesso.\n");
         usuarios[*numUsuarios] = novoUsuario;
         (*numUsuarios)++;
     } else {
-        printf("Erro ao criar diretorio para o usuario.\n");
+        printf("Erro ao criar diretório para o usuário.\n");
     }
 }
 
@@ -301,7 +316,7 @@ void criarArquivo(char* nomeUsuario, char* nomeArquivo) {
     FILE* arquivo = fopen(caminhoArquivo, "w");
     if (arquivo) {
         printf("Arquivo criado com sucesso.\n");
-        printf("Digite o conte�do do arquivo (Digite '.' em uma nova linha para sair):\n");
+        printf("Digite o conteudo do arquivo (Digite '.' em uma nova linha para sair):\n");
 
         char linha[100];
         while (1) {
